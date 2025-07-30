@@ -1,0 +1,6 @@
+[submodule "3rd_party/Crow"]
+	path = 3rd_party/Crow
+	url = https://github.com/CrowCpp/Crow.git
+[submodule "3rd_party/SGBD"]
+	path = 3rd_party/SGBD
+	url = https://github.com/ElQuesoHelado/SGBD.git
