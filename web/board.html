@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Board - {0} - {1}</title>
+  <link href="/static/thread.css" rel="stylesheet">
+</head>
+<body>
+  <h1>{0} - {1}</h1>
+
+  <form id="filter-form" style="margin-bottom: 20px;">
+    <label for="order">Ordenar por fecha:</label>
+    <select id="order" name="order">
+      <option value="">Seleccionar orden</option>
+      <option value="asc">Ascendente</option>
+      <option value="desc">Descendente</option>
+    </select>
+
+    <label for="start-date">Desde:</label>
+    <input type="date" id="start-date" name="start-date">
+
+    <label for="end-date">Hasta:</label>
+    <input type="date" id="end-date" name="end-date">
+
+    <button type="submit">Aplicar</button>
+  </form>
+
+  {2}
+
+  <script src="/static/board.js"></script>
+  </body>
+</html>

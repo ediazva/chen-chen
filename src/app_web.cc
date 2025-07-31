@@ -3,25 +3,19 @@
 #include <board.hpp>
 #include <crow.h>
 
+template<typename... Args>
+std::string load_html(const std::string& path, Args&&... args) {
+  std::ifstream file{"web/" + path};
+  if(!file.is_open())
+    return "ERROR";
+
+  std::stringstream ss;
+  ss << file.rdbuf();
+
+  return std::vformat(ss.str(), std::make_format_args(args...));
+}
+
 std::string create_index_html(ResultSet&& boards) {
-  const std::string top =
-R"(<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Boards - Chen Chen</title>
-  <link href="/static/board.css" rel="stylesheet">
-</head>
-<body>
-  <h1>ChenChen Boards</h1>
-  <div class="container">
-)";
-  const std::string bottom =
-R"(  </div>
-</body>
-</html>
-)";
-  
   std::string content;
   auto create_tag = [&content] (const RegisterEntry& entry) {
     content += std::format(
@@ -39,7 +33,7 @@ R"(    <a class="board-link" href="/board/{}">
   for(auto&& col : boards)
     create_tag(col);
 
-  return top + content + bottom;
+  return load_html("index.html", content);
 }
 
 std::string convert_date_to_pretty_date(std::string&& date) {
@@ -53,25 +47,6 @@ std::string convert_date_to_pretty_date(std::string&& date) {
 }
 
 std::string create_board_html(ResultSet&& board, ResultSet&& threads) {
-  const std::string top =  std::format(
-R"(<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Board - {0} - {1}</title>
-  <link href="/static/thread.css" rel="stylesheet">
-</head>
-<body>
-  <h1>{0} - {1}</h1>
-)",
-SQL_type_to_string(board.registers[0].values[1]),
-SQL_type_to_string(board.registers[0].values[2]));
-
-  const std::string bottom = 
-R"(</body>
-</html>
-)";
-  
   std::string content;
   auto create_tag = [&content, &board] (const RegisterEntry& entry) {
     content += std::format(
@@ -94,30 +69,13 @@ R"(  <div class="thread">
   for(auto&& col : threads)
     create_tag(col);
 
-  return top + content + bottom;
+  return load_html("board.html",
+    SQL_type_to_string(board.registers[0].values[1]),
+    SQL_type_to_string(board.registers[0].values[2]),
+    content);
 }
 
 std::string create_post_html(ResultSet&& board, ResultSet&& thread, ResultSet&& posts) {
-  const std::string top =  std::format(
-R"(<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>{0} - Thread #{1}</title>
-  <link href="/static/post.css" rel="stylesheet">
-</head>
-<body>
-  <h1>{0} - Thread #{1}: {2}</h1>
-)",
-SQL_type_to_string(board.registers[0].values[1]),
-SQL_type_to_string(thread.registers[0].values[0]),
-SQL_type_to_string(thread.registers[0].values[2]));
-
-  const std::string bottom = 
-R"(</body>
-</html>
-)";
-
   std::string content;
   auto create_tag = [&content, &board] (const RegisterEntry& entry) {
     std::string path = SQL_type_to_string(entry.values[4]);
@@ -142,7 +100,11 @@ R"(  <div class="post">
   for(auto&& col : posts)
     create_tag(col);
 
-  return top + content + bottom;
+  return load_html("post.html",
+    SQL_type_to_string(board.registers[0].values[1]),
+    SQL_type_to_string(thread.registers[0].values[0]),
+    SQL_type_to_string(thread.registers[0].values[2]),
+    content);
 }
 
 int App::run() {
@@ -158,11 +120,19 @@ int App::run() {
   });
 
   CROW_ROUTE(app, "/board/<int>")
-  ([&board](int id_board) {
+  ([&board](const crow::request& req, int id_board) {
+    auto order = req.url_params.get("order");
+    ResultSet threads;
+    if(!order || strlen(order) == 0) {
+      threads = board.get_threads_from_board(id_board);
+    } else {
+      threads = board.get_threads_from_board_ordered_by_date(id_board, strcmp(order, "asc") == 0);
+    }
+
     crow::response res;
     res.code = 200;
     res.set_header("Content-Type", "text/html");
-    res.body = create_board_html(board.get_board_on_id(id_board), board.get_threads_from_board(id_board));
+    res.body = create_board_html(board.get_board_on_id(id_board), std::move(threads));
     return res;
   });
 

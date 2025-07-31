@@ -18,12 +18,11 @@ add_custom_command(
   COMMAND ${CMAKE_COMMAND} -E copy_directory
     ${CMAKE_SOURCE_DIR}/static/
     ${BIN_DIR}/static/
-)
-
-add_custom_command(
-    TARGET chenchen POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${BIN_DIR}/csv
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${CMAKE_SOURCE_DIR}/csv
-        ${BIN_DIR}/csv
+  COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${CMAKE_SOURCE_DIR}/web/
+    ${BIN_DIR}/web/
+  COMMAND ${CMAKE_COMMAND} -E make_directory ${BIN_DIR}/csv
+  COMMAND ${CMAKE_COMMAND} -E copy_directory
+      ${CMAKE_SOURCE_DIR}/csv
+      ${BIN_DIR}/csv
 )
