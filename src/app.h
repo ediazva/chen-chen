@@ -6,9 +6,7 @@ class App {
 
   bool initDisk();
   bool createDisk();
-  bool createBoardsTable();
-  bool createPostsTable();
-  bool createThreadsTable();
+  bool createTables();
 public:
   bool init();
 
