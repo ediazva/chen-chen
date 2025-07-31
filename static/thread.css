@@ -1,0 +1,39 @@
+body {
+  background-color: #d6dacd; /* fondo típico de 4chan */
+  font-family: 'MS Sans Serif', sans-serif;
+  color: #000;
+  padding: 20px;
+}
+
+h1 {
+  font-size: 24px;
+  border-bottom: 2px solid #000;
+  margin-bottom: 20px;
+}
+
+.thread {
+  border: 1px solid #000;
+  background-color: #f0f0f0;
+  padding: 10px;
+  margin-bottom: 15px;
+  box-shadow: 2px 2px 0 #888;
+}
+
+.thread a {
+  color: blue;
+  text-decoration: none;
+}
+
+.thread a:hover {
+  text-decoration: underline;
+}
+
+.thread-header {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.thread-date {
+  font-size: 11px;
+  color: #555;
+}
